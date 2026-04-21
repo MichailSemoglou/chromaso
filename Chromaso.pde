@@ -2,8 +2,6 @@ import controlP5.*;
 
 ControlP5 cp5;
 
-// Caps the ramp at ~99.2% (126/127) to prevent pure-white / pure-black
-// clipping at the top swatch while keeping a visually smooth gradient.
 final float MAX_RAMP_VALUE = 126;
 
 int hue_Saturation;
@@ -153,12 +151,17 @@ void mousePressed() {
     new java.awt.datatransfer.StringSelection(hexValue), null
   );
   copyMessage = "Copied " + hexValue;
-  copyMessageTimer = 90; // ~1.5 s at 60 fps
+  copyMessageTimer = 90;
 }
 
 void keyPressed() {
   if (keyCode == 83) {
-    saveFrame(System.getProperty("user.home") + "/Desktop/Chromaso/Chromaso-###.png");
+    java.io.File dir = new java.io.File(System.getProperty("user.home"), "Chromaso");
+    if (!dir.exists() && !dir.mkdirs()) {
+      println("ERROR: could not create save directory: " + dir.getAbsolutePath());
+      return;
+    }
+    saveFrame(dir.getAbsolutePath() + "/Chromaso-###.png");
   }
   if (key == ESC) {
     key = 0;
