@@ -1,7 +1,11 @@
 import controlP5.*;
 
 ControlP5 cp5;
-String username = System.getProperty("user.name");
+
+// Caps the ramp at ~99.2% (126/127) to prevent pure-white / pure-black
+// clipping at the top swatch while keeping a visually smooth gradient.
+final float MAX_RAMP_VALUE = 126;
+
 int hue_Saturation;
 int hue_Brightness;
 int countX = 2;
@@ -9,6 +13,9 @@ int countY = 5;
 float sizeX, sizeY;
 PFont font;
 PFont fontLabel;
+
+String copyMessage = "";
+int copyMessageTimer = 0;
 
 void setup() {
   size(500, 600);
@@ -81,7 +88,7 @@ void draw() {
   for (int i=0; i<countX; i++) {
     for (int j=0; j<countY; j++) {
       float amt = map(j, 0, countY, 0, 1);
-      float val = lerp(0, 126, amt);
+      float val = lerp(0, MAX_RAMP_VALUE, amt);
       if (i==0) {
         color cS = color(hue_Saturation, val, 100);
         fill(cS);
@@ -109,11 +116,49 @@ void draw() {
       }
     }
   }
+
+  // On-screen copy confirmation
+  if (copyMessageTimer > 0) {
+    copyMessageTimer--;
+    textFont(fontLabel);
+    float msgW = textWidth(copyMessage) + 20;
+    fill(0, 0, 0, 180);
+    noStroke();
+    rectMode(CENTER);
+    rect(width/2, height - 30, msgW, 24, 6);
+    rectMode(CORNER);
+    fill(0, 0, 100);
+    textAlign(CENTER, CENTER);
+    text(copyMessage, width/2, height - 30);
+  }
+}
+
+void mousePressed() {
+  if (cp5.isMouseOver()) return;
+  int i = floor(mouseX / sizeX);
+  int j = floor(mouseY / sizeY);
+  if (i < 0 || i >= countX || j < 0 || j >= countY) return;
+
+  float amt = map(j, 0, countY, 0, 1);
+  float val = lerp(0, MAX_RAMP_VALUE, amt);
+  color c;
+  if (i == 0) {
+    c = color(hue_Saturation, val, 100);
+  } else {
+    c = color(hue_Brightness, 100, val);
+  }
+
+  String hexValue = "#" + hex(c).substring(2);
+  java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
+    new java.awt.datatransfer.StringSelection(hexValue), null
+  );
+  copyMessage = "Copied " + hexValue;
+  copyMessageTimer = 90; // ~1.5 s at 60 fps
 }
 
 void keyPressed() {
   if (keyCode == 83) {
-    saveFrame("/Users/"+username+"/Desktop/Chromaso/Chromaso-###.png");
+    saveFrame(System.getProperty("user.home") + "/Desktop/Chromaso/Chromaso-###.png");
   }
   if (key == ESC) {
     key = 0;
