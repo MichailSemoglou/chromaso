@@ -8,6 +8,8 @@ Chromaso is a Processing sketch that visualizes color hue, saturation, and brigh
 
 - Interactive sliders for adjusting hue, saturation, and brightness
 - Real-time color visualization
+- Click any swatch to copy its HEX value to the clipboard
+- Brief on-screen confirmation toast showing the copied value
 - Ability to save color palettes as images
 
 ## Installation
@@ -40,7 +42,8 @@ Note: SF Compact Text is free to use and available from Apple's website.
 1. Run the sketch in Processing
 2. Use the sliders to adjust the hue, saturation, and brightness values
 3. The color palettes will update in real-time
-4. Press "S" to save the current color palette as an image on your desktop
+4. Press **S** to save the current color palette as a PNG to `~/Chromaso/`
+5. Click any swatch to copy its HEX colour value to the clipboard
 
 ## License
 
